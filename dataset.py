@@ -12,8 +12,8 @@ class WMH_Dataset(Dataset):
         self.image_dir = image_dir
         self.mask_dir = mask_dir
         self.transform = transform
-        self.images = os.listdir(image_dir)
-        self.masks = os.listdir(mask_dir)
+        self.images = sorted(os.listdir(image_dir))
+        self.masks = sorted(os.listdir(mask_dir))
     
     def __len__(self):
         return len(self.images)
@@ -40,7 +40,7 @@ class WMH_Dataset(Dataset):
             image = augmentations["image"]
             mask = augmentations["mask"]
         #image = np.swapaxes(image, 0, 2)
-        print(f"image shape {img_path} {image.shape} mask {mask_path} {mask.shape}")
+        print(f"image {img_path} {image.shape} mask {mask_path} {mask.shape}")
 
         #print(f"image shape {img_path} {image.shape} mask {mask_path} {mask.shape}")
         # target shape (320, 320, 104)
@@ -55,11 +55,6 @@ class WMH_Dataset(Dataset):
             image = np.pad(image, ((6, 6),(0, 0),(0, 0)), 'constant', constant_values = 0)
             #print(f"image path {img_path} shape {image.shape}")
 
-        '''elif image.shape[0] == 224:
-            #print(f"enter image shape 224")
-            #print(f"image path {img_path} shape {image.shape}")
-            image = np.pad(image, ((48, 48),(0, 0),(0, 0)), 'constant', constant_values = 0)'''
-
         if mask.shape[0] == 212:
             #print(f"image path {img_path} shape {image.shape}")
             mask = np.pad(mask, ((6, 6),(0, 0),(0, 0)), 'constant', constant_values = 0)
@@ -71,7 +66,9 @@ class WMH_Dataset(Dataset):
         #print(f"image shape {img_path} {image.shape} mask {mask_path} {mask.shape}")'''
         #print(f"\n")
 
-        #print(f"image {image}")
+        #print(f"image {image.shape}")
+        image = np.stack((image,)*3, axis = 0)
+        #print(f"image 2 {image.shape}")
 
         mask = np.stack((mask, mask), 0)
         return image, mask
